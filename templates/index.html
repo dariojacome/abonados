@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Abonados</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Abonados</h1>
+
+    <!-- Formulario de búsqueda -->
+    <form action="/search" method="GET">
+        <label for="N_ABONADO">Buscar por N_ABONADO:</label>
+        <input type="text" id="N_ABONADO" name="N_ABONADO" maxlength="6" minlength="5" required>
+        <button type="submit">Buscar</button>
+    </form>
+    
+    <!-- Tabla para listar abonados -->
+    <table>
+        <thead>
+            <tr>
+                <th>N_ABONADO</th>
+                <th>CONTRASENA</th>
+                <th>OLT</th>
+                <th>INTERFACE</th>
+                <th>ONU</th>
+                <th>MAC</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for abonado in abonados %}
+            <tr>
+                <td>{{ abonado.N_ABONADO }}</td>
+                <td>{{ abonado.CONTRASENA }}</td>
+                <td>{{ abonado.OLT or '' }}</td>
+                <td>{{ abonado.INTERFACE or '' }}</td>
+                <td>{{ abonado.ONU or '' }}</td>
+                <td>{{ abonado.MAC or '' }}</td>
+                <td>
+                    <a href="/edit/{{ abonado.id }}">Editar</a> 
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

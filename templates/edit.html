@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Abonado</title>
+</head>
+<body>
+    <h1>Editar Abonado</h1>
+
+    <!-- Información del abonado -->
+    <p><strong>N_ABONADO:</strong> {{ abonado.N_ABONADO }}</p>
+    <p><strong>CONTRASENA:</strong> {{ abonado.CONTRASENA }}</p>
+
+    <!-- Formulario para editar campos -->
+    <form action="/edit/{{ abonado.id }}" method="POST">
+        <label for="OLT">OLT:</label>
+        <input type="text" id="OLT" name="OLT" value="{{ abonado.OLT or '' }}" maxlength="2"><br><br>
+
+        <label for="INTERFACE">INTERFACE:</label>
+        <input type="text" id="INTERFACE" name="INTERFACE" value="{{ abonado.INTERFACE or '' }}" maxlength="4"><br><br>
+
+        <label for="ONU">ONU:</label>
+        <input type="number" id="ONU" name="ONU" value="{{ abonado.ONU or '' }}" min="0" max="128"><br><br>
+
+        <label for="MAC">MAC:</label>
+        <input type="text" id="MAC" name="MAC" value="{{ abonado.MAC or '' }}" maxlength="22"><br><br>
+
+        <button type="submit">Guardar Cambios</button>
+        <a href="/">Cancelar</a>
+    </form>
+</body>
+</html>
