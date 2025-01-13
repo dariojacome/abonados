@@ -1,10 +1,18 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.secret_key = 'tu_clave_secreta'  # Cambia esto por una clave secreta única
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db = SQLAlchemy(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+# ===================== MODELOS =====================
 
 class Abonado(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -15,51 +23,87 @@ class Abonado(db.Model):
     ONU = db.Column(db.Integer, nullable=True)
     MAC = db.Column(db.String(22), nullable=True)
 
-# Inicializa la base de datos y carga los datos
-with app.app_context():
-    db.create_all()  # Crea las tablas si no existen
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), nullable=False, unique=True)
+    password_hash = db.Column(db.String(128), nullable=False)
 
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# ===================== RUTAS =====================
 
 @app.route('/')
+@login_required  # Protege la página de inicio
 def index():
     abonados = Abonado.query.all()
     return render_template('index.html', abonados=abonados)
 
-@app.route('/search', methods=['GET'])
-def search():
-    n_abonado = request.args.get('N_ABONADO')
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user = User.query.filter_by(username=username).first()
 
-    # Validar que N_ABONADO tenga entre 5 y 6 dígitos
-    if not n_abonado.isdigit() or not (5 <= len(n_abonado) <= 6):
-        return "Error: N_ABONADO debe tener entre 5 y 6 dígitos numéricos.", 400
+        if user and user.check_password(password):
+            login_user(user)
+            flash('Inicio de sesión exitoso.', 'success')
+            return redirect(url_for('index'))
+        else:
+            flash('Nombre de usuario o contraseña incorrectos.', 'danger')
+    return render_template('login.html')
 
-    abonado = Abonado.query.filter_by(N_ABONADO=n_abonado).first()
-    if not abonado:
-        return f"No se encontró ningún abonado con N_ABONADO: {n_abonado}"
-    return render_template('edit.html', abonado=abonado)
-
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Has cerrado sesión.', 'info')
+    return redirect(url_for('login'))
 
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
+@login_required  # Protege la página de edición
 def edit(id):
     abonado = Abonado.query.get_or_404(id)
     if request.method == 'POST':
-        try:
-            onu_value = int(request.form['ONU'])
-            if onu_value > 128:
-                raise ValueError("el numero maximo de ONU es 128.")
-            abonado.ONU = onu_value
-        except ValueError as e:
-            return f"Error: {e}"
-
         abonado.OLT = request.form['OLT']
         abonado.INTERFACE = request.form['INTERFACE']
+        abonado.ONU = request.form['ONU']
         abonado.MAC = request.form['MAC']
         db.session.commit()
+        flash('Registro actualizado con éxito.', 'success')
         return redirect(url_for('index'))
     return render_template('edit.html', abonado=abonado)
 
+@app.route('/delete/<int:id>', methods=['POST'])
+@login_required  # Protege la acción de eliminación
+def delete(id):
+    abonado = Abonado.query.get_or_404(id)
+    db.session.delete(abonado)
+    db.session.commit()
+    flash('Registro eliminado con éxito.', 'success')
+    return redirect(url_for('index'))
+
+# ===================== CONFIGURACIÓN INICIAL =====================
+
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()  # Asegura que las tablas se creen al iniciar la aplicación
+        # Crear un usuario de prueba si no existe
+        if not User.query.filter_by(username='admin').first():
+            admin = User(username='admin')
+            admin.set_password('admin123')  # Cambia esta contraseña
+            db.session.add(admin)
+            db.session.commit()
+
     from os import environ
-    port = int(environ.get('PORT', 5000))  # Usa el puerto asignado por Render o 5000 por defecto
+    port = int(environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
 
