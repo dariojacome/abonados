@@ -4,7 +4,7 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = 'tu_clave_secreta'  # Cambia esto por una clave secreta única
+app.secret_key = 'tu_clave_secreta'  # Cambia esto por una clave secreta unica
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -12,7 +12,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# ===================== MODELOS =====================
+#           MODELOS 
 
 class Abonado(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -24,7 +24,6 @@ class Abonado(db.Model):
     MARCA = db.Column(db.String(8), nullable=True)
     MAC = db.Column(db.String(22), nullable=True)
     MAC_ = db.Column(db.String(22), nullable=True)
-
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -143,7 +142,7 @@ def delete(id):
 
     return redirect(url_for('index'))
 
-# ===================== CONFIGURACIÓN INICIAL =====================
+#         CONFIGURACIÓN INICIAL 
 
 if __name__ == '__main__':
     with app.app_context():
