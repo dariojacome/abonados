@@ -41,7 +41,9 @@
                 <th>OLT</th>
                 <th>INTERFACE</th>
                 <th>ONU</th>
+                <th>MARCA</th>
                 <th>MAC</th>
+                <th>MAC_</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -53,9 +55,11 @@
                 <td>{{ abonado.OLT or '' }}</td>
                 <td>{{ abonado.INTERFACE or '' }}</td>
                 <td>{{ abonado.ONU or '' }}</td>
+                <td>{{ abonado.MARCA or '' }}</td>
                 <td>{{ abonado.MAC or '' }}</td>
+                <td>{{ abonado.MAC_ or '' }}</td>
                 <td>
-                    <a href="/edit/{{ abonado.id }}">Editar</a> 
+                    <a href="/edit/{{ abonado.id }}">Editar</a> | <a href="/delete/{{ abonado.id }}">Borrar</a>
                 </td>
             </tr>
             {% endfor %}

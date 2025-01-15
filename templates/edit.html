@@ -15,13 +15,33 @@
     <!-- Formulario para editar campos -->
     <form action="/edit/{{ abonado.id }}" method="POST">
         <label for="OLT">OLT:</label>
-        <input type="text" id="OLT" name="OLT" value="{{ abonado.OLT or '' }}" maxlength="2"><br><br>
+        <select id="OLT" name="OLT">
+            <option value="" {{ 'selected' if abonado.OLT == '' else '' }}></option>
+            <option value="1" {{ 'selected' if abonado.OLT == '1' else '' }}>1</option>
+            <option value="2" {{ 'selected' if abonado.OLT == '2' else '' }}>2</option>
+            <option value="3" {{ 'selected' if abonado.OLT == '3' else '' }}>3</option>
+            <option value="4" {{ 'selected' if abonado.OLT == '4' else '' }}>4</option>
+            <option value="5" {{ 'selected' if abonado.OLT == '5' else '' }}>5</option>
+            <option value="6" {{ 'selected' if abonado.OLT == '6' else '' }}>6</option>
+            <option value="BD" {{ 'selected' if abonado.OLT == 'BD' else '' }}>BD</option>
+            <option value="SJ" {{ 'selected' if abonado.OLT == 'SJ' else '' }}>SJ</option>
+        </select><br><br>
 
         <label for="INTERFACE">INTERFACE:</label>
         <input type="text" id="INTERFACE" name="INTERFACE" value="{{ abonado.INTERFACE or '' }}" maxlength="4"><br><br>
 
         <label for="ONU">ONU:</label>
         <input type="number" id="ONU" name="ONU" value="{{ abonado.ONU or '' }}" min="0" max="128"><br><br>
+
+        <label for="MARCA">MARCA:</label>
+        <select id="MARCA" name="MARCA">
+
+            <option value="" {{ 'selected' if abonado.MARCA == '' else '' }}></option>
+            <option value="FURUKAWA" {{ 'selected' if abonado.MARCA == 'FURUKAWA' else '' }}>FURUKAWA</option>
+            <option value="BDCOM" {{ 'selected' if abonado.MARCA == 'BDCOM' else '' }}>BDCOM</option>
+            <option value="LATIC" {{ 'selected' if abonado.MARCA == 'LATIC' else '' }}>LATIC</option>
+
+        </select><br><br>
 
         <label for="MAC">MAC:</label>
         <input type="text" id="MAC" name="MAC" value="{{ abonado.MAC or '' }}" maxlength="22"><br><br>
